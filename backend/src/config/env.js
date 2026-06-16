@@ -2,6 +2,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function normalizeOrigin(url) {
+  return url.trim().replace(/\/+$/, '');
+}
+
 export const env = {
   port: process.env.PORT || 5000,
   mongoUri: process.env.MONGO_URI,
@@ -9,7 +13,7 @@ export const env = {
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
   clientUrls: (process.env.CLIENT_URL || 'http://localhost:5173')
     .split(',')
-    .map((url) => url.trim())
+    .map(normalizeOrigin)
     .filter(Boolean),
   openAiKey: process.env.OPENAI_API_KEY,
   geminiKey: process.env.GEMINI_API_KEY,
@@ -23,6 +27,8 @@ export function validateEnv() {
   if (!env.jwtSecret) missing.push('JWT_SECRET');
 
   if (missing.length) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    throw new Error(
+      `Missing required environment variables: ${missing.join(', ')}. Add them in the Render service Environment tab.`
+    );
   }
 }

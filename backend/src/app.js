@@ -22,7 +22,9 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || env.clientUrls.includes(origin)) {
+      const normalizedOrigin = origin?.replace(/\/+$/, '');
+
+      if (!origin || env.clientUrls.includes(normalizedOrigin)) {
         return callback(null, true);
       }
 

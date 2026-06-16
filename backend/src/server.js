@@ -12,6 +12,15 @@ async function start() {
 }
 
 start().catch((error) => {
-  console.error(error);
+  console.error('Backend startup failed:', error.message);
+
+  if (error.message?.includes('querySrv') || error.message?.includes('ENOTFOUND')) {
+    console.error('Check that MONGO_URI is a valid MongoDB Atlas connection string.');
+  }
+
+  if (error.message?.includes('Server selection timed out')) {
+    console.error('Check MongoDB Atlas Network Access. Render usually needs 0.0.0.0/0 on free services.');
+  }
+
   process.exit(1);
 });
