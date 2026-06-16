@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import mongoose from 'mongoose';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -45,7 +46,12 @@ app.use(
 );
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
+  const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+
+  res.json({
+    status: 'ok',
+    database: dbStates[mongoose.connection.readyState] || 'unknown'
+  });
 });
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

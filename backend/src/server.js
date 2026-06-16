@@ -2,16 +2,7 @@ import app from './app.js';
 import { connectDB } from './config/db.js';
 import { env, validateEnv } from './config/env.js';
 
-async function start() {
-  validateEnv();
-  await connectDB();
-
-  app.listen(env.port, () => {
-    console.log(`API running on http://localhost:${env.port}`);
-  });
-}
-
-start().catch((error) => {
+function logStartupError(error) {
   console.error('Backend startup failed:', error.message);
 
   if (error.message?.includes('querySrv') || error.message?.includes('ENOTFOUND')) {
@@ -21,6 +12,18 @@ start().catch((error) => {
   if (error.message?.includes('Server selection timed out')) {
     console.error('Check MongoDB Atlas Network Access. Render usually needs 0.0.0.0/0 on free services.');
   }
+}
 
-  process.exit(1);
+async function connectWithDiagnostics() {
+  try {
+    validateEnv();
+    await connectDB();
+  } catch (error) {
+    logStartupError(error);
+  }
+}
+
+app.listen(env.port, () => {
+  console.log(`API running on http://localhost:${env.port}`);
+  connectWithDiagnostics();
 });
