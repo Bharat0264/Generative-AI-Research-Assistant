@@ -50,7 +50,8 @@ app.get('/api/health', (_req, res) => {
 
   res.json({
     status: 'ok',
-    database: dbStates[mongoose.connection.readyState] || 'unknown'
+    database: dbStates[mongoose.connection.readyState] || 'unknown',
+    databaseError: app.locals.databaseError || null
   });
 });
 

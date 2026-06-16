@@ -2,6 +2,9 @@ import app from './app.js';
 import { connectDB } from './config/db.js';
 import { env, validateEnv } from './config/env.js';
 
+const RETRY_MS = Number(process.env.MONGO_RETRY_MS || 30000);
+let connecting = false;
+
 function logStartupError(error) {
   console.error('Backend startup failed:', error.message);
 
@@ -15,11 +18,21 @@ function logStartupError(error) {
 }
 
 async function connectWithDiagnostics() {
+  if (connecting) return;
+
   try {
+    connecting = true;
     validateEnv();
     await connectDB();
+    app.locals.databaseError = null;
   } catch (error) {
+    app.locals.databaseError = error.message
+      ?.replace(/mongodb(\+srv)?:\/\/[^\s]+/g, 'mongodb://<redacted>')
+      .slice(0, 280);
     logStartupError(error);
+    setTimeout(connectWithDiagnostics, RETRY_MS);
+  } finally {
+    connecting = false;
   }
 }
 
