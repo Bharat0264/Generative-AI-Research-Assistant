@@ -56,8 +56,22 @@ async function geminiEmbedding(input) {
 }
 
 export async function generateEmbedding(input) {
-  if (env.openAiKey) return openAiEmbedding(input);
-  if (env.geminiKey) return geminiEmbedding(input);
+  if (env.openAiKey) {
+    try {
+      return await openAiEmbedding(input);
+    } catch (error) {
+      console.error('OpenAI embedding failed, using local fallback:', error.message);
+    }
+  }
+
+  if (env.geminiKey) {
+    try {
+      return await geminiEmbedding(input);
+    } catch (error) {
+      console.error('Gemini embedding failed, using local fallback:', error.message);
+    }
+  }
+
   return localEmbedding(input);
 }
 
@@ -124,7 +138,21 @@ function localText(prompt) {
 }
 
 export async function generateText(prompt, options = {}) {
-  if (env.openAiKey) return openAiText(prompt, options.temperature);
-  if (env.geminiKey) return geminiText(prompt, options.temperature);
+  if (env.openAiKey) {
+    try {
+      return await openAiText(prompt, options.temperature);
+    } catch (error) {
+      console.error('OpenAI text generation failed, using local fallback:', error.message);
+    }
+  }
+
+  if (env.geminiKey) {
+    try {
+      return await geminiText(prompt, options.temperature);
+    } catch (error) {
+      console.error('Gemini text generation failed, using local fallback:', error.message);
+    }
+  }
+
   return localText(prompt);
 }
