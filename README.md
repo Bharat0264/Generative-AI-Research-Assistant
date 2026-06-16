@@ -130,3 +130,60 @@ http://localhost:5173
 - Without an AI key, the project still runs with local fallback embeddings and extractive responses for development testing.
 - File uploads are stored in `backend/uploads`.
 - Users can only access documents, chats, and reports that belong to their own account.
+
+## Test PDF Source
+
+Use arXiv to download open research PDFs for testing. Example:
+
+```txt
+https://arxiv.org/pdf/1706.03762
+```
+
+## Deployment
+
+### Backend on Render
+
+1. Push this repository to GitHub.
+2. In Render, create a new Blueprint or Web Service from this repo.
+3. Render can use `render.yaml`, which points to the `backend` folder.
+4. Set these Render environment variables:
+
+```env
+MONGO_URI=your-mongodb-atlas-uri
+JWT_SECRET=your-long-random-secret
+CLIENT_URL=https://your-vercel-app.vercel.app
+GEMINI_API_KEY=your-gemini-key
+GEMINI_CHAT_MODEL=gemini-1.5-flash
+GEMINI_EMBEDDING_MODEL=text-embedding-004
+MAX_FILE_SIZE_MB=15
+```
+
+5. After deploy, confirm:
+
+```txt
+https://your-render-service.onrender.com/api/health
+```
+
+### Frontend on Vercel
+
+1. Import the GitHub repository in Vercel.
+2. Use the root project. `vercel.json` builds the `frontend` folder.
+3. Set this Vercel environment variable:
+
+```env
+VITE_API_URL=https://your-render-service.onrender.com/api
+```
+
+4. Redeploy the frontend after setting the Render API URL.
+
+### Connect Frontend and Backend
+
+After both URLs exist:
+
+- In Render, set `CLIENT_URL` to your Vercel URL.
+- In Vercel, set `VITE_API_URL` to your Render backend URL plus `/api`.
+- If you also want local development allowed, set Render `CLIENT_URL` as comma-separated origins:
+
+```env
+CLIENT_URL=http://localhost:5173,https://your-vercel-app.vercel.app
+```

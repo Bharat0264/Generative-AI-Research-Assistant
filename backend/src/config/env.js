@@ -7,6 +7,10 @@ export const env = {
   mongoUri: process.env.MONGO_URI,
   jwtSecret: process.env.JWT_SECRET,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  clientUrls: (process.env.CLIENT_URL || 'http://localhost:5173')
+    .split(',')
+    .map((url) => url.trim())
+    .filter(Boolean),
   openAiKey: process.env.OPENAI_API_KEY,
   geminiKey: process.env.GEMINI_API_KEY,
   maxFileSizeMb: Number(process.env.MAX_FILE_SIZE_MB || 15)
